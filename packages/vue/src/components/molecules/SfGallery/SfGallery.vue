@@ -8,9 +8,6 @@
               v-for="(video, index) in videos"
               :key="'slide-' + index"
               class="glide__slide"
-              @mouseover="startZoom(video)"
-              @mousemove="moveZoom($event, index)"
-              @mouseout="removeZoom(index)"
             >
               <iframe
                 :width="imageWidth"
