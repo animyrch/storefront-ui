@@ -74,6 +74,7 @@ const Template = (args, { argTypes }) => ({
   template: `
   <SfGallery
     :images="images"
+    :videos="videos"
     :image-width="imageWidth"
     :image-height="imageHeight"
     :slider-options="sliderOptions"
@@ -140,6 +141,21 @@ Common.args = {
 
 export const WithZoom = Template.bind({});
 WithZoom.args = { ...Common.args, enableZoom: true };
+
+export const WithVideos = Template.bind({});
+WithVideos.args = { ...Common.args, videos: [
+    {
+      stage: {
+        url: 'https://www.youtube.com/embed/KPs6LDFIT8A',
+        alt: 'test video'
+      },
+      thumbnail: {
+        url: 'http://img.youtube.com/vi/KPs6LDFIT8A/default.jpg',
+        alt: 'test video explanation'
+      }
+    }
+  ]
+};
 
 export const WithOutsideZoom = Template.bind({});
 WithOutsideZoom.args = { ...Common.args, enableZoom: true, outsideZoom: true };

@@ -5,12 +5,30 @@
         <div class="glide__track" data-glide-el="track">
           <ul class="glide__slides">
             <li
-              v-for="(picture, index) in images"
+              v-for="(video, index) in videos"
               :key="'slide-' + index"
               class="glide__slide"
-              @mouseover="startZoom(picture)"
+              @mouseover="startZoom(video)"
               @mousemove="moveZoom($event, index)"
               @mouseout="removeZoom(index)"
+            >
+              <iframe
+                :width="imageWidth"
+                :height="imageHeight"
+                :src="video.stage.url"
+                :title="video.stage.alt"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              />
+            </li>
+            <li
+              v-for="(picture, index) in images"
+              :key="'slide-' + (index + videosOffset)"
+              class="glide__slide"
+              @mouseover="startZoom(picture)"
+              @mousemove="moveZoom($event, index + videosOffset)"
+              @mouseout="removeZoom(index + videosOffset)"
             >
               <SfImage
                 ref="sfGalleryBigImage"
@@ -20,7 +38,9 @@
                 :alt="picture.alt"
                 :width="imageWidth"
                 :height="imageHeight"
-                @click="$emit('click:stage', { picture, index })"
+                @click="
+                  $emit('click:stage', { picture, index: index + videosOffset })
+                "
               />
             </li>
           </ul>
@@ -44,13 +64,32 @@
       </transition>
     </div>
     <div class="sf-gallery__thumbs">
-      <slot name="thumbs" v-bind="{ images, active: activeIndex, go }">
+      <slot name="thumbs-video" v-bind="{ videos, active: activeIndex, go }">
         <SfButton
-          v-for="(image, index) in images"
+          v-for="(video, index) in videos"
           :key="'img-' + index"
           class="sf-button--pure sf-gallery__item"
           :class="{ 'sf-gallery__item--selected': index === activeIndex }"
           @click="go(index)"
+        >
+          <SfImage
+            class="sf-gallery__thumb"
+            :src="video.thumbnail.url"
+            :alt="video.thumbnail.alt"
+            :width="thumbWidth"
+            :height="thumbHeight"
+          />
+        </SfButton>
+      </slot>
+      <slot name="thumbs" v-bind="{ images, active: activeIndex, go }">
+        <SfButton
+          v-for="(image, index) in images"
+          :key="'img-' + (index + videosOffset)"
+          class="sf-button--pure sf-gallery__item"
+          :class="{
+            'sf-gallery__item--selected': index + videosOffset === activeIndex,
+          }"
+          @click="go(index + videosOffset)"
         >
           <SfImage
             class="sf-gallery__thumb"
@@ -145,6 +184,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * Videos list
+     */
+    videos: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -166,6 +212,9 @@ export default {
     },
     updatedSliderOptions() {
       return { ...this.sliderOptions, startAt: this.activeIndex };
+    },
+    videosOffset() {
+      return this.videos.length;
     },
   },
   mounted() {
